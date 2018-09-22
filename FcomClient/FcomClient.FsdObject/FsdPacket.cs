@@ -62,6 +62,10 @@ namespace FcomClient.FsdObject
 			// then, convert to string and chop off the trailing newline
 			this.PacketString = System.Text.Encoding.UTF8.GetString(noHeader).Trim();
 
+			// it seems that the server will sometimes smush multiple FSD packets into a single TCP packet.
+			// if this happens, break them up.
+			// TODO
+
 			// raise event if PM
 			if (this.IsPrivateMessage() && OnMessageArrival != null)
 				OnMessageArrival();

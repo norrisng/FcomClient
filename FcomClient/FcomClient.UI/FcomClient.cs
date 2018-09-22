@@ -127,17 +127,29 @@ namespace FcomClient.UI
 			// Only do something if it's a PM
 			if (/*pkt.PacketString.EndsWith("\n") && */pkt.PacketString.StartsWith("#TM"))
 			{
-				FsdMessage pm = new FsdMessage(timestamp, pkt.PacketString);				
+				FsdMessage pm = new FsdMessage(timestamp, pkt.PacketString);
 
-				// ignore non-PM messages (i.e. from/to SERVER, to FP, to DATA), (as well as outgoing PMs)
-				if (!string.Equals(pm.Sender, "server", StringComparison.OrdinalIgnoreCase) &&
-				!string.Equals(pm.Recipient, "server", StringComparison.OrdinalIgnoreCase) &&
-				!string.Equals(pm.Recipient, "fp", StringComparison.OrdinalIgnoreCase) &&
-				!string.Equals(pm.Recipient, "data", StringComparison.OrdinalIgnoreCase) &&
-				!string.Equals(pm.Sender, callsign, StringComparison.OrdinalIgnoreCase))
+				// ignore certain messages:
+
+				// this includes under-the-hood ones to SERVER/FP/DATA...
+				bool isServerMessage =
+					string.Equals(pm.Sender, "server", StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(pm.Recipient, "server", StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(pm.Recipient, "fp", StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(pm.Recipient, "data", StringComparison.OrdinalIgnoreCase)
+					;
+
+				// private/frequency messages not addressed to the user...
+				bool isAddressedToUser = pm.Message.StartsWith(callsign, StringComparison.OrdinalIgnoreCase) ||
+										string.Equals(pm.Recipient, callsign, StringComparison.OrdinalIgnoreCase);
+
+				// and self-addressed messages:
+				bool isSelfMessage = string.Equals(pm.Sender, callsign, StringComparison.OrdinalIgnoreCase);
+
+				// putting all of the above conditions together:
+				if (!isServerMessage && isAddressedToUser && !isSelfMessage)
 				{
-					Console.WriteLine("{0} ({1}): \n" +
-										"{2}",
+					Console.WriteLine("{0} ({1}): \n{2}",
 										pm.Sender, pm.Timestamp.ToLongTimeString(), pm.Message);
 
 					// Send it to the API
