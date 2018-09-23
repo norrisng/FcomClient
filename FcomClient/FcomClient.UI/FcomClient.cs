@@ -133,9 +133,9 @@ namespace FcomClient.UI
 
 				// this includes under-the-hood ones to SERVER/FP/DATA...
 				bool isServerMessage =
-					string.Equals(pm.Sender, "server", StringComparison.OrdinalIgnoreCase) &&
-					string.Equals(pm.Recipient, "server", StringComparison.OrdinalIgnoreCase) &&
-					string.Equals(pm.Recipient, "fp", StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(pm.Sender, "server", StringComparison.OrdinalIgnoreCase) ||
+					string.Equals(pm.Recipient, "server", StringComparison.OrdinalIgnoreCase) ||
+					string.Equals(pm.Recipient, "fp", StringComparison.OrdinalIgnoreCase) ||
 					string.Equals(pm.Recipient, "data", StringComparison.OrdinalIgnoreCase)
 					;
 
@@ -151,16 +151,11 @@ namespace FcomClient.UI
 				{
 					Console.WriteLine("{0} ({1}): \n{2}",
 										pm.Sender, pm.Timestamp.ToLongTimeString(), pm.Message);
-
-					// Send it to the API
-					MessageForwarder api = new MessageForwarder();
+					am.ForwardMessage(pm);
 
 					// Do not forward messages sent over the frequency, that aren't addressed to the user
-					if (pm.Message.StartsWith(callsign))
-						am.ForwardMessage(pm);
-
-					am.ForwardMessage(pm);
-					//api.UploadMessage(pm);
+					//if (pm.Message.StartsWith(callsign))
+					//	am.ForwardMessage(pm);
 				}				
 
 			}
