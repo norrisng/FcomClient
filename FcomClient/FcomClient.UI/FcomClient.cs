@@ -21,12 +21,12 @@ namespace FcomClient.UI
 			{
 				bool isInputValid = false;
 
-				while (isInputValid)
+				while (!isInputValid)
 				{
 					Console.Write("\nPlease enter your exact callsign, then press Enter: ");
 					callsign = Console.ReadLine();
 
-					Regex callsignFormat = new Regex(@"(\d|\w|_)+");
+					Regex callsignFormat = new Regex(@"^(\d|\w|_)+$");
 					if (callsignFormat.IsMatch(callsign))
 						isInputValid = true;
 					else
