@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SharpPcap;
 using FcomClient.Serialization;
 using FcomClient.FsdObject;
+using System.Text.RegularExpressions;
 
 namespace FcomClient.UI
 {
@@ -18,8 +19,19 @@ namespace FcomClient.UI
 
 			while (!isRegistered)
 			{
-				Console.Write("\nPlease enter your exact callsign, then press Enter: ");
-				callsign = Console.ReadLine();
+				bool isInputValid = false;
+
+				while (isInputValid)
+				{
+					Console.Write("\nPlease enter your exact callsign, then press Enter: ");
+					callsign = Console.ReadLine();
+
+					Regex callsignFormat = new Regex(@"(\d|\w|_)+");
+					if (callsignFormat.IsMatch(callsign))
+						isInputValid = true;
+					else
+						Console.WriteLine("Invalid callsign!");
+				}
 
 				Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
 				string token = Console.ReadLine();
@@ -27,14 +39,14 @@ namespace FcomClient.UI
 				Console.WriteLine("\nRegistering token with Discord bot...");
 				am = new ApiManager(token, callsign);
 				
-				if (am.DiscordId != null)
+				if (am.DiscordId != 0)
 				{
 					Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
 					isRegistered = true;
 				}
 				else
 				{
-					Console.WriteLine("Could not register!");
+					Console.WriteLine("Could not register! ");
 				}
 			}		
 
