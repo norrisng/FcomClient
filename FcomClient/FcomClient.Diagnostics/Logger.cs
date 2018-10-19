@@ -7,7 +7,7 @@ namespace FcomClient.Diagnostics
 		/// <summary>
 		/// Name of the log file.
 		/// </summary>
-		public string Filename = "log.txt";
+		private string Filename = "log.txt";
 
 		/// <summary>
 		/// Default constructor. Saves all log messages to "log.txt".
@@ -27,7 +27,7 @@ namespace FcomClient.Diagnostics
 		}
 
 		/// <summary>
-		/// Prints the specified log message, and saves it to the specified file.
+		/// Saves a log message to the specified file.
 		/// The timestamp is automatically appended to the front of the message.
 		/// </summary>
 		/// <param name="msg"></param>
@@ -36,7 +36,6 @@ namespace FcomClient.Diagnostics
 			// YYYY-MM-DD hh:mm:ssZ
 			DateTime timestamp = DateTime.UtcNow;
 			string logMessage = String.Format("{0}: {1}", timestamp.ToString("u"), msg);
-			Console.WriteLine(logMessage);
 			System.IO.File.AppendAllLines(Filename, new string[] { logMessage });
 		}
 

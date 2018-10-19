@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FcomClient.Diagnostics\Logger.cs" />
     <Compile Include="FcomClient.FsdDetection\ConnectionManager.cs" />
     <Compile Include="FcomClient.FsdDetection\HardwareDevice.cs" />
     <Compile Include="FcomClient.FsdObject\FsdPacket.cs" />

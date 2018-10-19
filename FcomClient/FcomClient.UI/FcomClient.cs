@@ -1,4 +1,5 @@
 ﻿using FcomClient.FsdDetection;
+using FcomClient.Diagnostics;
 using System;
 using System.Collections.Generic;
 using SharpPcap;
@@ -12,9 +13,12 @@ namespace FcomClient.UI
 	{
 		static string callsign = "";
 		static ApiManager am;
+		static Logger logger = new Logger();	// log.txt
 
 		static void Main(string[] args)
 		{
+			logger.Log("Starting FcomClient...");
+
 			bool isRegistered = false;
 
 			while (!isRegistered)
@@ -31,10 +35,12 @@ namespace FcomClient.UI
 						isInputValid = true;
 					else
 						Console.WriteLine("Invalid callsign!");
-				}
+				}				
 
 				Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
 				string token = Console.ReadLine();
+
+				logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
 
 				Console.WriteLine("\nRegistering token with Discord bot...");
 				am = new ApiManager(token, callsign);
@@ -115,6 +121,8 @@ namespace FcomClient.UI
 			Console.WriteLine("\nYou may now minimize this window. To quit, simply close it.");
 			Console.WriteLine("When you're done, close this window and send \"remove\" to the Discord bot!\n\n");
 
+			logger.Log("Starting FSD capture...");
+
 			// Start capturing packets indefinitely
 			device.Capture();
 
@@ -162,8 +170,14 @@ namespace FcomClient.UI
 				// putting all of the above conditions together:
 				if (!isServerMessage && isAddressedToUser && !isSelfMessage)
 				{
-					Console.WriteLine("{0} ({1}): \n{2}",
-										pm.Sender, pm.Timestamp.ToLongTimeString(), pm.Message);
+					string loggingString = String.Format("{0} > {1} ({2}):\"{3}\" ", 
+														pm.Sender, 
+														pm.Recipient, 
+														pm.Timestamp.ToUniversalTime(), 
+														pm.Message);
+					Console.WriteLine(loggingString);
+					logger.Log(loggingString);
+
 					am.ForwardMessage(pm);
 
 					// Do not forward messages sent over the frequency, that aren't addressed to the user
