@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FcomClient.Serialization.ApiObjects;
 using RestSharp;
 using RestSharp.Deserializers;
@@ -14,6 +11,11 @@ namespace FcomClient.Serialization
 	/// </summary>
 	class ApiManager
 	{
+		/// <summary>
+		/// User agent string to use.
+		/// </summary>
+		private readonly string CLIENT_VERSION = "FcomClient/0.8.0";
+		
 		/// <summary>
 		/// Server address, read from the file server_location.txt
 		/// </summary>
@@ -63,6 +65,8 @@ namespace FcomClient.Serialization
 			client = new RestClient(SERVER_ADDRESS);
 			RestRequest registerRequest 
 				= new RestRequest(REGISTRATION_ENDPOINT, Method.GET);
+
+			client.UserAgent = CLIENT_VERSION;
 
 			registerRequest.AddParameter("token", token);
 			registerRequest.AddParameter("callsign", callsign);
