@@ -12,6 +12,11 @@ namespace FcomClient.Serialization
 	class ApiManager
 	{
 		/// <summary>
+		/// User agent string to use.
+		/// </summary>
+		private readonly string CLIENT_VERSION = "FcomClient/0.8.0";
+		
+		/// <summary>
 		/// Server address, read from the file server_location.txt
 		/// </summary>
 		private readonly string SERVER_ADDRESS = System.IO.File.ReadAllText("server_location.txt");
@@ -60,6 +65,8 @@ namespace FcomClient.Serialization
 			client = new RestClient(SERVER_ADDRESS);
 			RestRequest registerRequest 
 				= new RestRequest(REGISTRATION_ENDPOINT, Method.GET);
+
+			client.UserAgent = CLIENT_VERSION;
 
 			registerRequest.AddParameter("token", token);
 			registerRequest.AddParameter("callsign", callsign);
