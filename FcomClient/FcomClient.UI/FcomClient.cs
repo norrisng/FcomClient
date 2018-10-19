@@ -81,16 +81,17 @@ namespace FcomClient.UI
 					}
 
 					i++;
-				}				
+				}
 
+				bool parseSuccess = false;
 				int deviceNumber = -1;
 				Console.WriteLine("\nWhich of the above is your internet connection?");
 
 				// Ignore invalid inputs
-				while (deviceNumber < 0 || deviceNumber >= connections.Count)
+				while (deviceNumber < 0 || deviceNumber >= connections.Count || !parseSuccess)
 				{
 					Console.Write("Enter the corresponding number: ");
-					Int32.TryParse(Console.ReadLine(), out deviceNumber);
+					parseSuccess = Int32.TryParse(Console.ReadLine(), out deviceNumber);
 				}
 
 				device = connections[deviceNumber].Device;
