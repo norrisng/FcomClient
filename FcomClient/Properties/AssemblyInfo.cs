@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FcomClient")]
-[assembly: AssemblyCopyright("Noris Ng")]
+[assembly: AssemblyCopyright("Norris Ng")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
