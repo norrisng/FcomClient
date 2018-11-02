@@ -24,7 +24,9 @@ namespace FcomClient.FsdObject
 						break;
 					case 1:     // recipient
 						// if it's a frequency message, it'll be addressed to "@xxyyy" (i.e. 1xx.yyy MHz)
-						base.Recipient = contents[1].Replace("@", "1");
+						// base.Recipient = contents[1].Replace("@", "1");
+						// NOTE: don't replace the "@", so the server knows it's a frequency
+						base.Recipient = contents[1];
 						break;
 					case 2:     // message contents
 						this.Message = contents[2];
