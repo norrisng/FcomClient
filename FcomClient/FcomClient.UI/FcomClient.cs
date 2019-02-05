@@ -49,7 +49,7 @@ namespace FcomClient.UI
 
 			// ask user for callsign + verification code,
 			// if not provided via args, or if args were invalid
-			else if (!isInputValid) { 
+			if (!isInputValid) { 
 
 				bool isRegistered = false;
 				while (!isRegistered)
