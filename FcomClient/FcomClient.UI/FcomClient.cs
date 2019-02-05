@@ -65,17 +65,20 @@ namespace FcomClient.UI
 
 					Console.WriteLine("\nRegistering token with Discord bot...");
 					am = new ApiManager(token, callsign);
+
+					isRegistered = am.IsRegistered;
+					Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
 				}
 
-				if (am.DiscordId != 0)
-				{
-					Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
-					isRegistered = true;
-				}
-				else
-				{
-					Console.WriteLine("Could not register! ");
-				}
+				//if (am.DiscordId != 0)
+				//{
+				//	Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+				//	isRegistered = true;
+				//}
+				//else
+				//{
+				//	Console.WriteLine("Could not register! ");
+				//}
 			}		
 
 			Console.Write("\nDetecting connections...\n\n");
