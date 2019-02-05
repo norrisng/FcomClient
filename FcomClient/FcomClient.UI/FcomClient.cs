@@ -35,13 +35,21 @@ namespace FcomClient.UI
 			if (args.Length == 2)
 			{
 				if (callsignFormat.IsMatch(callsign))
-					callsign = args[0];
-
-				am = new ApiManager(args[1], callsign);
+				{
+					isInputValid = true;
+					callsign = args[0];					
+					am = new ApiManager(args[1], callsign);
+				}				
+				else
+				{
+					// if invalid callsign format, ask the user via the command-line interface
+					isInputValid = false;
+				}
 			}
 
-			// ask user for callsign + verification code
-			else { 
+			// ask user for callsign + verification code,
+			// if not provided via args, or if args were invalid
+			else if (!isInputValid) { 
 
 				bool isRegistered = false;
 				while (!isRegistered)
