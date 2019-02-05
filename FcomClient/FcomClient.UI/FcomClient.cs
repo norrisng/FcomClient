@@ -34,7 +34,7 @@ namespace FcomClient.UI
 			// Callsign + verification code provided via arguments
 			if (args.Length == 2)
 			{
-				if (callsignFormat.IsMatch(callsign))
+				if (callsignFormat.IsMatch(args[0]))
 				{
 					isInputValid = true;
 					callsign = args[0];					
