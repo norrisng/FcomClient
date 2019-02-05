@@ -57,6 +57,11 @@ namespace FcomClient.Serialization
 		private RestClient client;
 
 		/// <summary>
+		/// Whether the callsign/token associated with the ApiManager object is registered.
+		/// </summary>
+		public bool IsRegistered { get; }
+
+		/// <summary>
 		/// Initializes the API manager, 
 		/// passing the given token to the server for confirmation.
 		/// </summary>
@@ -86,6 +91,11 @@ namespace FcomClient.Serialization
 				this.DiscordId = returnPayload.DiscordId;
 				this.DiscordName = returnPayload.DiscordName;
 				this.Token = returnPayload.Token;
+
+				if (this.DiscordId == 0)
+					this.IsRegistered = false;
+				else
+					this.IsRegistered = true;
 			}
 			else
 			{
