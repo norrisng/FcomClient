@@ -13,38 +13,60 @@ namespace FcomClient.UI
 	{
 		static string callsign = "";
 		static ApiManager am;
-		static Logger logger = new Logger();	// log.txt
+		static Logger logger = new Logger();    // log.txt
 
+		/// <summary>
+		/// Main function
+		/// 
+		/// </summary>
+		/// <param name="args">
+		///		(Optional)
+		///		Callsign (args[0]) and verification code (args[1]). 
+		///		If not provided, the user is prompted to enter them via the commandline interface.
+		/// </param>
 		static void Main(string[] args)
 		{
 			logger.Log("Starting FcomClient...");
 
-			bool isRegistered = false;
+			bool isInputValid = false;
+			Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
 
-			while (!isRegistered)
+			// Callsign + verification code provided via arguments
+			if (args.Length == 2)
 			{
-				bool isInputValid = false;
+				if (callsignFormat.IsMatch(callsign))
+					callsign = args[0];
 
-				while (!isInputValid)
+				am = new ApiManager(args[1], callsign);
+			}
+
+			// ask user for callsign + verification code
+			else { 
+
+				bool isRegistered = false;
+				while (!isRegistered)
 				{
-					Console.Write("\nPlease enter your exact callsign, then press Enter: ");
-					callsign = Console.ReadLine();
+					
+					while (!isInputValid)
+					{
+						Console.Write("\nPlease enter your exact callsign, then press Enter: ");
+						callsign = Console.ReadLine();
+						
+						if (callsignFormat.IsMatch(callsign))
+							isInputValid = true;
+						else
+							Console.WriteLine("Invalid callsign!");
+					}
 
-					Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
-					if (callsignFormat.IsMatch(callsign))
-						isInputValid = true;
-					else
-						Console.WriteLine("Invalid callsign!");
-				}				
+					Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
+					string token = Console.ReadLine();
 
-				Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
-				string token = Console.ReadLine();
+					logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
 
-				logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
+					Console.WriteLine("\nRegistering token with Discord bot...");
+					am = new ApiManager(token, callsign);
+				}
 
-				Console.WriteLine("\nRegistering token with Discord bot...");
-				am = new ApiManager(token, callsign);
-				
 				if (am.DiscordId != 0)
 				{
 					Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
