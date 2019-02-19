@@ -88,14 +88,13 @@ namespace FcomClient.UI
 
 			ICaptureDevice device;
 
-			if (connections.Count == 1)
 			// Auto-select the only connection available
+			if (connections.Count == 1)			
 			{
 				device = connections[0].Device;
 			}
+			// Otherwise, prompt the user for the correct one
 			else
-			// Otherwise, show all available connections to the user,
-			// and ask for the correct one
 			{
 				int i = 0;
 				foreach (HardwareDevice h in connections)
@@ -109,7 +108,6 @@ namespace FcomClient.UI
 						// print detected IPs
 						Console.WriteLine("\t" + s);
 					}
-
 					i++;
 				}
 
@@ -170,7 +168,7 @@ namespace FcomClient.UI
 			string pktString = System.Text.Encoding.UTF8.GetString(e.Packet.Data);
 
 			// Only do something if it's a PM
-			if (/*pkt.PacketString.EndsWith("\n") && */pkt.PacketString.StartsWith("#TM"))
+			if (pkt.PacketString.StartsWith("#TM"))
 			{
 				FsdMessage pm = new FsdMessage(timestamp, pkt.PacketString);
 

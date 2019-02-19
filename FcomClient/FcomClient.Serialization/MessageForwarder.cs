@@ -52,7 +52,6 @@ namespace FcomClient.Serialization
 			var content = response.Content;
 
 			// TODO: handle API response (success / error etc)
-			//Console.WriteLine("API response: " + content);
 		}
 
 	}

@@ -78,8 +78,6 @@ namespace FcomClient.Serialization
 
 			registerRequest.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-			//IRestResponse<ServerRegistrationResponse> response 
-			//	= client.Execute<ServerRegistrationResponse>(registerRequest);
 			var response = client.Execute<ServerRegistrationResponse>(registerRequest);
 
 			if (response.IsSuccessful)
@@ -116,7 +114,6 @@ namespace FcomClient.Serialization
 
 			/* Sample JSON (after server rewrite):
 			   NOTE: currently, the API does not parse beyond the first message.
-
 			{
 				"token": 	"Wjve5p45aTojv6yzRr72FKs9K1py8ze2auFbB8g328o",
 				"messages":	[
@@ -128,7 +125,6 @@ namespace FcomClient.Serialization
 					}
 				]
 			}
-
 			 */
 
 			Console.Write(" -- Forwarding to {0}...", SERVER_ADDRESS);
@@ -140,7 +136,6 @@ namespace FcomClient.Serialization
 			};
 
 			// Build the JSON object
-
 			var messagePayload = new Message
 			{
 				timestamp = unixTimestamp.ToString(),
