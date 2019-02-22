@@ -1,4 +1,4 @@
-using FcomClient.FsdDetection;
+﻿using FcomClient.FsdDetection;
 using FcomClient.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -95,6 +95,8 @@ namespace FcomClient.UI
 			// TODO: completely decouple SharpPcap from the UI
 
 			// Provide GUI with list of detected connections and wait for user response
+			//ExternalGuiManager ext = new ExternalGuiManager();
+			//ICaptureDevice device = ext.GetHardwareDevice(connections).Device;       // BLOCKING CALL
 
 			ICaptureDevice device;
 
