@@ -219,6 +219,7 @@ namespace FcomClient.UI
 														pm.Timestamp.ToUniversalTime(), 
 														pm.Message);
 					Console.WriteLine(loggingString);
+					logger.Log(String.Format("<{0}>", pkt.PacketString));
 					logger.Log(loggingString);
 
 					am.ForwardMessage(pm);
