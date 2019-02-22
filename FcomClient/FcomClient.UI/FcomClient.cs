@@ -1,4 +1,4 @@
-﻿using FcomClient.FsdDetection;
+using FcomClient.FsdDetection;
 using FcomClient.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -6,11 +6,19 @@ using SharpPcap;
 using FcomClient.Serialization;
 using FcomClient.FsdObject;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;		// for hiding the console window
+
 
 namespace FcomClient.UI
 {
 	class FcomClient
 	{
+		// The following DLLImports are for hiding the console window
+		[DllImport("kernel32.dll")]
+		static extern IntPtr GetConsoleWindow();
+		[DllImport("user32.dll")]
+		static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
 		static string callsign = "";
 		static ApiManager am;
 		static Logger logger = new Logger();    // log.txt
@@ -86,12 +94,19 @@ namespace FcomClient.UI
 
 			// TODO: completely decouple SharpPcap from the UI
 
+			// Provide GUI with list of detected connections and wait for user response
+
 			ICaptureDevice device;
 
 			// Auto-select the only connection available
-			if (connections.Count == 1)			
+			if (connections.Count == 1)
 			{
 				device = connections[0].Device;
+
+				// No additional user input needed - close the console window if opened via GUI
+				if (args.Length == 2)					
+					ShowWindow(GetConsoleWindow(), 0);
+					
 			}
 			// Otherwise, prompt the user for the correct one
 			else
@@ -139,6 +154,10 @@ namespace FcomClient.UI
 
 			// set filter to tcp port 6809
 			device.Filter = "tcp port 6809";
+
+			// Hide console window
+			if (args.Length == 2)
+				ShowWindow(GetConsoleWindow(), 0);
 
 			Console.WriteLine("\nYou may now minimize this window. To quit, simply close it.");
 			Console.WriteLine("When you're done, close this window and send \"remove\" to the Discord bot!\n\n");
