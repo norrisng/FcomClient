@@ -45,7 +45,10 @@ namespace FcomClient.UI
 				if (callsignFormat.IsMatch(args[0]))
 				{
 					isInputValid = true;
-					callsign = args[0];					
+					callsign = args[0];
+
+					logger.Log(String.Format("Client was started with the following arguments: {0} {1}", args[0], args[1]));
+
 					am = new ApiManager(args[1], callsign);
 				}				
 				else
@@ -106,8 +109,11 @@ namespace FcomClient.UI
 				device = connections[0].Device;
 
 				// No additional user input needed - close the console window if opened via GUI
-				if (args.Length == 2)					
+				if (args.Length == 2)
+				{
 					ShowWindow(GetConsoleWindow(), 0);
+					logger.Log("Hiding console window");
+				}
 					
 			}
 			// Otherwise, prompt the user for the correct one
