@@ -249,7 +249,7 @@ namespace FcomClient.UI
 			// self-addressed messages:
 			bool isSelfMessage = string.Equals(msg.Sender, callsign, StringComparison.OrdinalIgnoreCase);
 
-			return !isServerMessage && !isAddressedToUser && !isSelfMessage;
+			return !isServerMessage && isAddressedToUser && !isSelfMessage;
 		}
 
 	}
