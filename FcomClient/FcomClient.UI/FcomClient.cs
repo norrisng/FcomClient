@@ -182,36 +182,30 @@ namespace FcomClient.UI
 		{			
 			DateTime timestamp = DateTime.Now;
 
-			// First, create a FsdPacket object from the packet
-			FsdPacket pkt = new FsdPacket(timestamp, e.Packet.Data);			
-
 			// FsdPacket trims the newline, so we have to grab the byte[] ourselves
 			string pktString = System.Text.Encoding.UTF8.GetString(e.Packet.Data);
+
+			string[] inputs = pktString.Split('\n');
+			foreach (string input in inputs)
+			{
+				// First, create a FsdPacket object from the packet
+				FsdPacket currPacket = new FsdPacket(timestamp, input);
+
+				if (input.StartsWith("#TM"))
+				{
+					FsdMessage input_pm = new FsdMessage(timestamp, input);
+				}
+			}
+
+			// First, create a FsdPacket object from the packet
+			FsdPacket pkt = new FsdPacket(timestamp, e.Packet.Data);			
 
 			// Only do something if it's a PM
 			if (pkt.PacketString.StartsWith("#TM"))
 			{
 				FsdMessage pm = new FsdMessage(timestamp, pkt.PacketString);
 
-				// ignore certain messages:
-
-				// this includes under-the-hood ones to SERVER/FP/DATA...
-				bool isServerMessage =
-					string.Equals(pm.Sender, "server", StringComparison.OrdinalIgnoreCase) ||
-					string.Equals(pm.Recipient, "server", StringComparison.OrdinalIgnoreCase) ||
-					string.Equals(pm.Recipient, "fp", StringComparison.OrdinalIgnoreCase) ||
-					string.Equals(pm.Recipient, "data", StringComparison.OrdinalIgnoreCase)
-					;
-
-				// private/frequency messages not addressed to the user...
-				bool isAddressedToUser = pm.Message.StartsWith(callsign, StringComparison.OrdinalIgnoreCase) ||
-										string.Equals(pm.Recipient, callsign, StringComparison.OrdinalIgnoreCase);
-
-				// and self-addressed messages:
-				bool isSelfMessage = string.Equals(pm.Sender, callsign, StringComparison.OrdinalIgnoreCase);
-
-				// putting all of the above conditions together:
-				if (!isServerMessage && isAddressedToUser && !isSelfMessage)
+				if (IsForwardMessage(pm))
 				{
 					string loggingString = String.Format("{0} > {1} ({2}):\"{3}\" ", 
 														pm.Sender, 
@@ -231,8 +225,31 @@ namespace FcomClient.UI
 
 			}
 
+		}
 
+		/// <summary>
+		/// Helper method for determining if a FsdMessage should be forwarded.
+		/// </summary>
+		/// <param name="f">The FsdMessage in question</param>
+		/// <returns>True if it should be forwarded, False otherwise</returns>
+		static private bool IsForwardMessage(FsdMessage msg)
+		{
+			// Under-the-hood ones to SERVER/FP/DATA...
+			bool isServerMessage =
+				string.Equals(msg.Sender, "server", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(msg.Recipient, "server", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(msg.Recipient, "fp", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(msg.Recipient, "data", StringComparison.OrdinalIgnoreCase)
+				;
 
+			// private/frequency messages not addressed to the user...
+			bool isAddressedToUser = msg.Message.StartsWith(callsign, StringComparison.OrdinalIgnoreCase) ||
+									string.Equals(msg.Recipient, callsign, StringComparison.OrdinalIgnoreCase);
+
+			// self-addressed messages:
+			bool isSelfMessage = string.Equals(msg.Sender, callsign, StringComparison.OrdinalIgnoreCase);
+
+			return !isServerMessage && !isAddressedToUser && !isSelfMessage;
 		}
 
 	}
