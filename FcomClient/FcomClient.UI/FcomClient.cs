@@ -165,7 +165,10 @@ namespace FcomClient.UI
 
 			// Hide console window
 			if (args.Length == 2)
+			{
+				logger.Log("Hiding console window");
 				ShowWindow(GetConsoleWindow(), 0);
+			}
 
 			Console.WriteLine("\nYou may now minimize this window. To quit, simply close it.");
 			Console.WriteLine("When you're done, close this window and send \"remove\" to the Discord bot!\n\n");
