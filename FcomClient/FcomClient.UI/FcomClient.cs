@@ -34,154 +34,160 @@ namespace FcomClient.UI
 		/// </param>
 		static void Main(string[] args)
 		{
-			logger.Log("Starting FcomClient...");
+			try {
+				logger.Log("Starting FcomClient...");
 
-			bool isInputValid = false;
-			Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
+				bool isInputValid = false;
+				Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
 
-			// Callsign + verification code provided via arguments
-			if (args.Length == 2)
-			{
-				if (callsignFormat.IsMatch(args[0]))
-				{
-					isInputValid = true;
-					callsign = args[0];
-
-					logger.Log(String.Format("Client was started with the following arguments: {0} {1}", args[0], args[1]));
-
-					am = new ApiManager(args[1], callsign);
-				}				
-				else
-				{
-					// if invalid callsign format, ask the user via the command-line interface
-					isInputValid = false;
-				}
-			}
-
-			// ask user for callsign + verification code,
-			// if not provided via args, or if args were invalid
-			if (!isInputValid) { 
-
-				bool isRegistered = false;
-				while (!isRegistered)
-				{
-					
-					while (!isInputValid)
-					{
-						Console.Write("\nPlease enter your exact callsign, then press Enter: ");
-						callsign = Console.ReadLine();
-						
-						if (callsignFormat.IsMatch(callsign))
-							isInputValid = true;
-						else
-							Console.WriteLine("Invalid callsign!");
-					}
-
-					Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
-					string token = Console.ReadLine();
-
-					logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
-
-					Console.WriteLine("\nRegistering token with Discord bot...");
-					am = new ApiManager(token, callsign);
-
-					isRegistered = am.IsRegistered;
-					Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
-				}
-
-			}		
-
-			Console.Write("\nDetecting connections...\n\n");
-			ConnectionManager cm = new ConnectionManager();
-			List<HardwareDevice> connections = cm.Connections;
-
-			// TODO: completely decouple SharpPcap from the UI
-
-			// Provide GUI with list of detected connections and wait for user response
-			//ExternalGuiManager ext = new ExternalGuiManager();
-			//ICaptureDevice device = ext.GetHardwareDevice(connections).Device;       // BLOCKING CALL
-
-			ICaptureDevice device;
-
-			// Auto-select the only connection available
-			if (connections.Count == 1)
-			{
-				device = connections[0].Device;
-
-				// No additional user input needed - close the console window if opened via GUI
+				// Callsign + verification code provided via arguments
 				if (args.Length == 2)
 				{
-					ShowWindow(GetConsoleWindow(), 0);
-					logger.Log("Hiding console window");
-				}
-					
-			}
-			// Otherwise, prompt the user for the correct one
-			else
-			{
-				int i = 0;
-				foreach (HardwareDevice h in connections)
-				{
-					Console.WriteLine("({0})", i);
-					Console.WriteLine("------");
-					Console.WriteLine("Name: {0}\nDescription: {1}", h.FriendlyName, h.Description);
-					Console.WriteLine("IP addresses:");
-					foreach (string s in h.IpAddresses)
+					if (callsignFormat.IsMatch(args[0]))
 					{
-						// print detected IPs
-						Console.WriteLine("\t" + s);
+						isInputValid = true;
+						callsign = args[0];
+
+						logger.Log(String.Format("Client was started with the following arguments: {0} {1}", args[0], args[1]));
+
+						am = new ApiManager(args[1], callsign);
 					}
-					i++;
+					else
+					{
+						// if invalid callsign format, ask the user via the command-line interface
+						isInputValid = false;
+					}
 				}
 
-				bool parseSuccess = false;
-				int deviceNumber = -1;
-				Console.WriteLine("\nWhich of the above is your internet connection?");
+				// ask user for callsign + verification code,
+				// if not provided via args, or if args were invalid
+				if (!isInputValid) {
 
-				// Ignore invalid inputs
-				while (deviceNumber < 0 || deviceNumber >= connections.Count || !parseSuccess)
+					bool isRegistered = false;
+					while (!isRegistered)
+					{
+
+						while (!isInputValid)
+						{
+							Console.Write("\nPlease enter your exact callsign, then press Enter: ");
+							callsign = Console.ReadLine();
+
+							if (callsignFormat.IsMatch(callsign))
+								isInputValid = true;
+							else
+								Console.WriteLine("Invalid callsign!");
+						}
+
+						Console.Write("\nPlease enter the verification code from Discord, then press Enter:\n");
+						string token = Console.ReadLine();
+
+						logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
+
+						Console.WriteLine("\nRegistering token with Discord bot...");
+						am = new ApiManager(token, callsign);
+
+						isRegistered = am.IsRegistered;
+						Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+					}
+
+				}
+
+				Console.Write("\nDetecting connections...\n\n");
+				ConnectionManager cm = new ConnectionManager();
+				List<HardwareDevice> connections = cm.Connections;
+
+				// TODO: completely decouple SharpPcap from the UI
+
+				// Provide GUI with list of detected connections and wait for user response
+				//ExternalGuiManager ext = new ExternalGuiManager();
+				//ICaptureDevice device = ext.GetHardwareDevice(connections).Device;       // BLOCKING CALL
+
+				ICaptureDevice device;
+
+				// Auto-select the only connection available
+				if (connections.Count == 1)
 				{
-					Console.Write("Enter the corresponding number: ");
-					parseSuccess = Int32.TryParse(Console.ReadLine(), out deviceNumber);
+					device = connections[0].Device;
+
+					// No additional user input needed - close the console window if opened via GUI
+					if (args.Length == 2)
+					{
+						ShowWindow(GetConsoleWindow(), 0);
+						logger.Log("Hiding console window");
+					}
+
+				}
+				// Otherwise, prompt the user for the correct one
+				else
+				{
+					int i = 0;
+					foreach (HardwareDevice h in connections)
+					{
+						Console.WriteLine("({0})", i);
+						Console.WriteLine("------");
+						Console.WriteLine("Name: {0}\nDescription: {1}", h.FriendlyName, h.Description);
+						Console.WriteLine("IP addresses:");
+						foreach (string s in h.IpAddresses)
+						{
+							// print detected IPs
+							Console.WriteLine("\t" + s);
+						}
+						i++;
+					}
+
+					bool parseSuccess = false;
+					int deviceNumber = -1;
+					Console.WriteLine("\nWhich of the above is your internet connection?");
+
+					// Ignore invalid inputs
+					while (deviceNumber < 0 || deviceNumber >= connections.Count || !parseSuccess)
+					{
+						Console.Write("Enter the corresponding number: ");
+						parseSuccess = Int32.TryParse(Console.ReadLine(), out deviceNumber);
+					}
+
+					device = connections[deviceNumber].Device;
+
 				}
 
-				device = connections[deviceNumber].Device;
+				// force a wait so that the user can see what's happening
+				System.Threading.Thread.Sleep(700);
 
+				// register event handler
+				device.OnPacketArrival +=
+					new SharpPcap.PacketArrivalEventHandler(OnIncomingFsdPacket);
+
+				// open device for capturing
+				int readTimeoutMilliseconds = 2000;
+				device.Open(DeviceMode.Normal, readTimeoutMilliseconds);
+
+				// set filter to tcp port 6809
+				device.Filter = "tcp port 6809";
+
+				// Hide console window
+				if (args.Length == 2)
+				{
+					logger.Log("Hiding console window");
+					ShowWindow(GetConsoleWindow(), 0);
+				}
+
+				Console.WriteLine("\nYou may now minimize this window. To quit, simply close it.");
+				Console.WriteLine("When you're done, close this window and send \"remove\" to the Discord bot!\n\n");
+
+				logger.Log("Starting FSD capture...");
+
+				// Start capturing packets indefinitely
+				device.Capture();
+
+				// note: this line is uncreachable, since we're capturing indefinitely
+				device.Close();
 			}
-
-			// force a wait so that the user can see what's happening
-			System.Threading.Thread.Sleep(700);
-
-			// register event handler
-			device.OnPacketArrival +=
-				new SharpPcap.PacketArrivalEventHandler(OnIncomingFsdPacket);
-
-			// open device for capturing
-			int readTimeoutMilliseconds = 2000;
-			device.Open(DeviceMode.Normal, readTimeoutMilliseconds);
-
-			// set filter to tcp port 6809
-			device.Filter = "tcp port 6809";
-
-			// Hide console window
-			if (args.Length == 2)
+			catch (Exception ex)
 			{
-				logger.Log("Hiding console window");
-				ShowWindow(GetConsoleWindow(), 0);
+				// Dump stack trace to logfile
+				logger.Log(ex.ToString());
 			}
-
-			Console.WriteLine("\nYou may now minimize this window. To quit, simply close it.");
-			Console.WriteLine("When you're done, close this window and send \"remove\" to the Discord bot!\n\n");
-
-			logger.Log("Starting FSD capture...");
-
-			// Start capturing packets indefinitely
-			device.Capture();
-
-			// note: this line is uncreachable, since we're capturing indefinitely
-			device.Close();
 		}
-
 		/// <summary>
 		/// Event handler for incoming FSD packets.
 		/// </summary>
