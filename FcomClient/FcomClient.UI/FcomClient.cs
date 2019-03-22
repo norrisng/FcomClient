@@ -84,6 +84,7 @@ namespace FcomClient.UI
 						logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
 
 						Console.WriteLine("\nRegistering token with Discord bot...");
+						logger.Log(String.Format("Register at {0}/{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
 						am = new ApiManager(token, callsign);
 
 						isRegistered = am.IsRegistered;

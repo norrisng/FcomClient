@@ -19,7 +19,7 @@ namespace FcomClient.Serialization
 		/// <summary>
 		/// Server address, read from the file server_location.txt
 		/// </summary>
-		private readonly string SERVER_ADDRESS = System.IO.File.ReadAllText("server_location.txt");
+		public readonly string SERVER_ADDRESS = System.IO.File.ReadAllText("server_location.txt");
 
 		/// <summary>
 		/// API endpoint for submitting messages to be forwarded.
@@ -29,7 +29,7 @@ namespace FcomClient.Serialization
 		/// <summary>
 		/// API endpoint for registering/confirming a token.
 		/// </summary>
-		private readonly string REGISTRATION_ENDPOINT = "/api/v1/register";
+		public readonly string REGISTRATION_ENDPOINT = "/api/v1/register";
 
 		/// <summary>
 		/// API registration token, provided by the bot and entered into FcomClient by the user.
