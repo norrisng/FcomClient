@@ -83,9 +83,9 @@ namespace FcomClient.UI
 
 						logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
 
-						Console.WriteLine("\nRegistering token with Discord bot...");
-						logger.Log(String.Format("Register at {0}/{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
+						Console.WriteLine("\nRegistering token with Discord bot...");						
 						am = new ApiManager(token, callsign);
+						logger.Log(String.Format("Register at {0}/{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
 
 						isRegistered = am.IsRegistered;
 						Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
@@ -184,9 +184,17 @@ namespace FcomClient.UI
 				device.Close();
 			}
 			catch (Exception ex)
-			{
+			{				
 				// Dump stack trace to logfile
 				logger.Log(ex.ToString());
+
+				Console.WriteLine("Critical error! Please see log.txt for error details.");
+
+				if (args.Length == 0)
+				{
+					Console.WriteLine("Press any key to exit");
+					Console.ReadKey();
+				}
 			}
 		}
 		/// <summary>
