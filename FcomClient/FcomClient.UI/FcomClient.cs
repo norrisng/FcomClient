@@ -85,7 +85,7 @@ namespace FcomClient.UI
 
 						Console.WriteLine("\nRegistering token with Discord bot...");						
 						am = new ApiManager(token, callsign);
-						logger.Log(String.Format("Register at {0}/{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
+						logger.Log(String.Format("Register at {0}{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
 
 						isRegistered = am.IsRegistered;
 						Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
@@ -186,7 +186,7 @@ namespace FcomClient.UI
 			catch (Exception ex)
 			{				
 				// Dump stack trace to logfile
-				logger.Log(ex.ToString());
+				logger.Log("Unhandled exception:\n" + ex.ToString());
 
 				Console.WriteLine("Critical error! Please see log.txt for error details.");
 
