@@ -190,7 +190,7 @@ namespace FcomClient.UI
 			catch (Exception ex)
 			{				
 				// Dump stack trace to logfile
-				logger.Log("Unhandled exception:\n" + ex.ToString());
+				logger.Log("[CRASH] " + ex.ToString());
 
 				Console.WriteLine("\nFcomClient has crashed! Please see log.txt for error details.\n");
 
