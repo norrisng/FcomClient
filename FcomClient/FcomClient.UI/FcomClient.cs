@@ -82,13 +82,17 @@ namespace FcomClient.UI
 						string token = Console.ReadLine();
 
 						logger.Log(String.Format("Callsign: \"{0}\", Token: \"{1}\"", callsign, token));
-
+						
 						Console.WriteLine("\nRegistering token with Discord bot...");						
 						am = new ApiManager(token, callsign);
 						logger.Log(String.Format("Register at {0}{1}", am.SERVER_ADDRESS, am.REGISTRATION_ENDPOINT));
 
 						isRegistered = am.IsRegistered;
-						Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+						if (isRegistered)
+							Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+						else
+							Console.WriteLine("Couldn't register! You've either entered the incorrect code," +
+												" or the server isn't responding.");
 					}
 
 				}
@@ -188,11 +192,11 @@ namespace FcomClient.UI
 				// Dump stack trace to logfile
 				logger.Log("Unhandled exception:\n" + ex.ToString());
 
-				Console.WriteLine("Critical error! Please see log.txt for error details.");
+				Console.WriteLine("\nFcomClient has crashed! Please see log.txt for error details.\n");
 
 				if (args.Length == 0)
 				{
-					Console.WriteLine("Press any key to exit");
+					Console.WriteLine("Press any key to exit...");
 					Console.ReadKey();
 				}
 			}
