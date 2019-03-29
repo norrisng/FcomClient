@@ -6,8 +6,8 @@ using SharpPcap;
 using FcomClient.Serialization;
 using FcomClient.FsdObject;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;		// for hiding the console window
-
+using System.Runtime.InteropServices;       // for hiding the console window
+using System.IO.Pipes;
 
 namespace FcomClient.UI
 {
@@ -89,12 +89,23 @@ namespace FcomClient.UI
 
 						isRegistered = am.IsRegistered;
 						if (isRegistered)
-							Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+						{
+							Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);							
+						}
 						else
 							Console.WriteLine("Couldn't register! You've either entered the incorrect code," +
 												" or the server isn't responding.");
 					}
 
+				}
+
+				// Send username to GUI via pipe
+				NamedPipeClientStream namedPipeClient = new NamedPipeClientStream("ca.norrisng.fcom");
+				
+				{
+					namedPipeClient.Connect();
+					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(am.DiscordName);
+					namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 				}
 
 				Console.Write("\nDetecting connections...\n\n");
