@@ -34,6 +34,9 @@ namespace FcomClient.UI
 		/// </param>
 		static void Main(string[] args)
 		{
+			// Callsign + verification code provided via arguments
+			bool startedWithArgs = (args.Length == 2);
+
 			try {
 				logger.Log("Starting FcomClient...");
 
@@ -41,7 +44,7 @@ namespace FcomClient.UI
 				Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
 
 				// Callsign + verification code provided via arguments
-				if (args.Length == 2)
+				if (startedWithArgs)
 				{
 					if (callsignFormat.IsMatch(args[0]))
 					{
@@ -100,13 +103,16 @@ namespace FcomClient.UI
 				}
 
 				// Send username to GUI via pipe
-				NamedPipeClientStream namedPipeClient = new NamedPipeClientStream("ca.norrisng.fcom");
-				
-				{
-					namedPipeClient.Connect();
-					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(am.DiscordName);
-					namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
-				}
+				string FCOM_GUI_PIPE = "ca.norrisng.fcom";
+				NamedPipeClientStream namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
+
+				string discordUsername = am.DiscordName;
+				Console.WriteLine(discordUsername);
+				logger.Log(string.Format("Pipe to GUI over {0}: {1}", FCOM_GUI_PIPE, discordUsername));
+				namedPipeClient.Connect();
+				byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(discordUsername);
+				namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
+
 
 				Console.Write("\nDetecting connections...\n\n");
 				ConnectionManager cm = new ConnectionManager();
@@ -126,7 +132,7 @@ namespace FcomClient.UI
 					device = connections[0].Device;
 
 					// No additional user input needed - close the console window if opened via GUI
-					if (args.Length == 2)
+					if (startedWithArgs)
 					{
 						ShowWindow(GetConsoleWindow(), 0);
 						logger.Log("Hiding console window");
@@ -181,7 +187,7 @@ namespace FcomClient.UI
 				device.Filter = "tcp port 6809";
 
 				// Hide console window
-				if (args.Length == 2)
+				if (startedWithArgs)
 				{
 					logger.Log("Hiding console window");
 					ShowWindow(GetConsoleWindow(), 0);
