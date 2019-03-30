@@ -19,7 +19,7 @@ namespace FcomClient.Serialization
 		/// <summary>
 		/// Server address, read from the file server_location.txt
 		/// </summary>
-		private readonly string SERVER_ADDRESS = System.IO.File.ReadAllText("server_location.txt");
+		public readonly string SERVER_ADDRESS = System.IO.File.ReadAllText("server_location.txt");
 
 		/// <summary>
 		/// API endpoint for submitting messages to be forwarded.
@@ -29,7 +29,7 @@ namespace FcomClient.Serialization
 		/// <summary>
 		/// API endpoint for registering/confirming a token.
 		/// </summary>
-		private readonly string REGISTRATION_ENDPOINT = "/api/v1/register";
+		public readonly string REGISTRATION_ENDPOINT = "/api/v1/register";
 
 		/// <summary>
 		/// API registration token, provided by the bot and entered into FcomClient by the user.
@@ -57,6 +57,11 @@ namespace FcomClient.Serialization
 		private RestClient client;
 
 		/// <summary>
+		/// Whether the callsign/token associated with the ApiManager object is registered.
+		/// </summary>
+		public bool IsRegistered { get; }
+
+		/// <summary>
 		/// Initializes the API manager, 
 		/// passing the given token to the server for confirmation.
 		/// </summary>
@@ -73,8 +78,6 @@ namespace FcomClient.Serialization
 
 			registerRequest.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-			//IRestResponse<ServerRegistrationResponse> response 
-			//	= client.Execute<ServerRegistrationResponse>(registerRequest);
 			var response = client.Execute<ServerRegistrationResponse>(registerRequest);
 
 			if (response.IsSuccessful)
@@ -86,6 +89,11 @@ namespace FcomClient.Serialization
 				this.DiscordId = returnPayload.DiscordId;
 				this.DiscordName = returnPayload.DiscordName;
 				this.Token = returnPayload.Token;
+
+				if (this.DiscordId == 0)
+					this.IsRegistered = false;
+				else
+					this.IsRegistered = true;
 			}
 			else
 			{
@@ -106,7 +114,6 @@ namespace FcomClient.Serialization
 
 			/* Sample JSON (after server rewrite):
 			   NOTE: currently, the API does not parse beyond the first message.
-
 			{
 				"token": 	"Wjve5p45aTojv6yzRr72FKs9K1py8ze2auFbB8g328o",
 				"messages":	[
@@ -118,7 +125,6 @@ namespace FcomClient.Serialization
 					}
 				]
 			}
-
 			 */
 
 			Console.Write(" -- Forwarding to {0}...", SERVER_ADDRESS);
@@ -130,7 +136,6 @@ namespace FcomClient.Serialization
 			};
 
 			// Build the JSON object
-
 			var messagePayload = new Message
 			{
 				timestamp = unixTimestamp.ToString(),
