@@ -6,8 +6,8 @@ using SharpPcap;
 using FcomClient.Serialization;
 using FcomClient.FsdObject;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;		// for hiding the console window
-
+using System.Runtime.InteropServices;       // for hiding the console window
+using System.IO.Pipes;
 
 namespace FcomClient.UI
 {
@@ -23,6 +23,9 @@ namespace FcomClient.UI
 		static ApiManager am;
 		static Logger logger = new Logger();    // log.txt
 
+		static NamedPipeClientStream namedPipeClient;   // named pipe to FcomGui
+		static readonly string FCOM_GUI_PIPE = "ca.norrisng.fcom";
+
 		/// <summary>
 		/// Main function
 		/// 
@@ -34,6 +37,9 @@ namespace FcomClient.UI
 		/// </param>
 		static void Main(string[] args)
 		{
+			// Callsign + verification code provided via arguments
+			bool isStartedWithArgs = (args.Length == 2);
+
 			try {
 				logger.Log("Starting FcomClient...");
 
@@ -41,8 +47,12 @@ namespace FcomClient.UI
 				Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
 
 				// Callsign + verification code provided via arguments
-				if (args.Length == 2)
+				if (isStartedWithArgs)
 				{
+					// Connect to GUI via named pipe
+					namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
+					namedPipeClient.Connect();
+
 					if (callsignFormat.IsMatch(args[0]))
 					{
 						isInputValid = true;
@@ -51,12 +61,21 @@ namespace FcomClient.UI
 						logger.Log(String.Format("Client was started with the following arguments: {0} {1}", args[0], args[1]));
 
 						am = new ApiManager(args[1], callsign);
+
+						if (!am.IsRegistered)
+						{
+							SendPipeMessage(namedPipeClient, "FCOM_API_ERROR");
+						}
 					}
 					else
 					{
 						// if invalid callsign format, ask the user via the command-line interface
 						isInputValid = false;
+
+						string msg = "Callsign format invalid. Please follow the instructions in the console window.";
+						SendPipeMessage(namedPipeClient, msg);
 					}
+
 				}
 
 				// ask user for callsign + verification code,
@@ -89,7 +108,9 @@ namespace FcomClient.UI
 
 						isRegistered = am.IsRegistered;
 						if (isRegistered)
-							Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);
+						{
+							Console.WriteLine("Registered {0} to Discord user {1} ({2})", callsign, am.DiscordName, am.DiscordId);							
+						}
 						else
 							Console.WriteLine("Couldn't register! You've either entered the incorrect code," +
 												" or the server isn't responding.");
@@ -115,7 +136,7 @@ namespace FcomClient.UI
 					device = connections[0].Device;
 
 					// No additional user input needed - close the console window if opened via GUI
-					if (args.Length == 2)
+					if (isStartedWithArgs)
 					{
 						ShowWindow(GetConsoleWindow(), 0);
 						logger.Log("Hiding console window");
@@ -170,7 +191,7 @@ namespace FcomClient.UI
 				device.Filter = "tcp port 6809";
 
 				// Hide console window
-				if (args.Length == 2)
+				if (isStartedWithArgs)
 				{
 					logger.Log("Hiding console window");
 					ShowWindow(GetConsoleWindow(), 0);
@@ -198,6 +219,12 @@ namespace FcomClient.UI
 				{
 					Console.WriteLine("Press any key to exit...");
 					Console.ReadKey();
+				}
+				else if (isStartedWithArgs)
+				{
+					// Notify GUI of crash
+					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes("FCOM_CLIENT_CRASH");
+					namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 				}
 			}
 		}
@@ -278,6 +305,17 @@ namespace FcomClient.UI
 			bool isSelfMessage = string.Equals(msg.Sender, callsign, StringComparison.OrdinalIgnoreCase);
 
 			return !isServerMessage && isAddressedToUser && !isSelfMessage;
+		}
+
+		/// <summary>
+		/// Helper function for sending a message to the GUI.
+		/// </summary>
+		/// <param name="pipe">Connected named pipe client stream</param>
+		/// <param name="message">The message to send to the GUI.</param>
+		private static void SendPipeMessage(NamedPipeClientStream pipe, string message)
+		{
+			byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
+			namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 		}
 
 	}
