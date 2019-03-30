@@ -23,7 +23,8 @@ namespace FcomClient.UI
 		static ApiManager am;
 		static Logger logger = new Logger();    // log.txt
 
-		static NamedPipeClientStream namedPipeClient;	// named pipe to FcomGui
+		static NamedPipeClientStream namedPipeClient;   // named pipe to FcomGui
+		static readonly string FCOM_GUI_PIPE = "ca.norrisng.fcom";
 
 		/// <summary>
 		/// Main function
@@ -48,6 +49,10 @@ namespace FcomClient.UI
 				// Callsign + verification code provided via arguments
 				if (isStartedWithArgs)
 				{
+					// Connect to GUI via named pipe
+					namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
+					namedPipeClient.Connect();
+
 					if (callsignFormat.IsMatch(args[0]))
 					{
 						isInputValid = true;
@@ -61,6 +66,9 @@ namespace FcomClient.UI
 					{
 						// if invalid callsign format, ask the user via the command-line interface
 						isInputValid = false;
+
+						string msg = "Callsign format invalid. Please follow the instructions in the console window.";
+						SendPipeMessage(namedPipeClient, msg);
 					}
 				}
 
@@ -104,14 +112,11 @@ namespace FcomClient.UI
 
 				}
 
-				// Send username to GUI via pipe
-				string FCOM_GUI_PIPE = "ca.norrisng.fcom";
-				namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
-
+				// Send username to GUI via pipe			
 				string discordUsername = am.DiscordName;
 				Console.WriteLine(discordUsername);
 				logger.Log(string.Format("Pipe to GUI over {0}: {1}", FCOM_GUI_PIPE, discordUsername));
-				namedPipeClient.Connect();
+				//namedPipeClient.Connect();
 				byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(discordUsername);
 				namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 
@@ -303,6 +308,17 @@ namespace FcomClient.UI
 			bool isSelfMessage = string.Equals(msg.Sender, callsign, StringComparison.OrdinalIgnoreCase);
 
 			return !isServerMessage && isAddressedToUser && !isSelfMessage;
+		}
+
+		/// <summary>
+		/// Helper function for sending a message to the GUI.
+		/// </summary>
+		/// <param name="pipe">Connected named pipe client stream</param>
+		/// <param name="message">The message to send to the GUI.</param>
+		private static void SendPipeMessage(NamedPipeClientStream pipe, string message)
+		{
+			byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
+			namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 		}
 
 	}
