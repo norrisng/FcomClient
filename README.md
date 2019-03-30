@@ -2,7 +2,7 @@
 
 The client that capture messages received over VATSIM / IVAO
 
-
+Version 0.9.0
 
 ## Requirements ##
 
@@ -16,6 +16,22 @@ The client that capture messages received over VATSIM / IVAO
 
 See the [Releases page on GitHub](https://github.com/norrisng/FcomClient/releases) for downloads.
 
-To install, simply extract the FcomClient folder to anywhere as desired.
+To install: 
 
-To run FcomClient, simply open `FcomClient.exe`.
+* Extract the FcomClient folder to any desired location
+* Run the included WinPcap installer (if not already installed)
+
+To run: 
+
+* Open `FcomGui.exe` (the one with the purple "F" icon)
+* Alternatively, open `FcomClient.exe` for the older "console" interface
+
+
+
+## More info ##
+
+Website: https://norrisng.ca/fcom
+
+Discord server: https://discord.gg/F59CyKC
+
+Dev blog: https://fcomforwarder.wordpress.com/
