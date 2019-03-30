@@ -64,16 +64,15 @@ namespace FcomClient.UI
 
 						if (!am.IsRegistered)
 						{
+							logger.Log("[FCOM_API_ERROR] Couldn't register with API");
 							SendPipeMessage(namedPipeClient, "FCOM_API_ERROR");
 						}
 					}
 					else
 					{
 						// if invalid callsign format, ask the user via the command-line interface
-						isInputValid = false;
-
-						string msg = "Callsign format invalid. Please follow the instructions in the console window.";
-						SendPipeMessage(namedPipeClient, msg);
+						isInputValid = false;						
+						SendPipeMessage(namedPipeClient, "FCOM_CLIENT_BAD_CALLSIGN");
 					}
 
 				}
