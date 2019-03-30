@@ -23,6 +23,8 @@ namespace FcomClient.UI
 		static ApiManager am;
 		static Logger logger = new Logger();    // log.txt
 
+		static NamedPipeClientStream namedPipeClient;	// named pipe to FcomGui
+
 		/// <summary>
 		/// Main function
 		/// 
@@ -35,7 +37,7 @@ namespace FcomClient.UI
 		static void Main(string[] args)
 		{
 			// Callsign + verification code provided via arguments
-			bool startedWithArgs = (args.Length == 2);
+			bool isStartedWithArgs = (args.Length == 2);
 
 			try {
 				logger.Log("Starting FcomClient...");
@@ -44,7 +46,7 @@ namespace FcomClient.UI
 				Regex callsignFormat = new Regex(@"^(\d|\w|_|-)+$");
 
 				// Callsign + verification code provided via arguments
-				if (startedWithArgs)
+				if (isStartedWithArgs)
 				{
 					if (callsignFormat.IsMatch(args[0]))
 					{
@@ -104,7 +106,7 @@ namespace FcomClient.UI
 
 				// Send username to GUI via pipe
 				string FCOM_GUI_PIPE = "ca.norrisng.fcom";
-				NamedPipeClientStream namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
+				namedPipeClient = new NamedPipeClientStream(FCOM_GUI_PIPE);
 
 				string discordUsername = am.DiscordName;
 				Console.WriteLine(discordUsername);
@@ -132,7 +134,7 @@ namespace FcomClient.UI
 					device = connections[0].Device;
 
 					// No additional user input needed - close the console window if opened via GUI
-					if (startedWithArgs)
+					if (isStartedWithArgs)
 					{
 						ShowWindow(GetConsoleWindow(), 0);
 						logger.Log("Hiding console window");
@@ -187,7 +189,7 @@ namespace FcomClient.UI
 				device.Filter = "tcp port 6809";
 
 				// Hide console window
-				if (startedWithArgs)
+				if (isStartedWithArgs)
 				{
 					logger.Log("Hiding console window");
 					ShowWindow(GetConsoleWindow(), 0);
@@ -215,6 +217,12 @@ namespace FcomClient.UI
 				{
 					Console.WriteLine("Press any key to exit...");
 					Console.ReadKey();
+				}
+				else if (isStartedWithArgs)
+				{
+					// Notify GUI of crash
+					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes("-1");
+					namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 				}
 			}
 		}
