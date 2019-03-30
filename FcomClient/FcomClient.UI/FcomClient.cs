@@ -61,6 +61,11 @@ namespace FcomClient.UI
 						logger.Log(String.Format("Client was started with the following arguments: {0} {1}", args[0], args[1]));
 
 						am = new ApiManager(args[1], callsign);
+
+						if (!am.IsRegistered)
+						{
+							SendPipeMessage(namedPipeClient, "FCOM_API_ERROR");
+						}
 					}
 					else
 					{
@@ -70,6 +75,7 @@ namespace FcomClient.UI
 						string msg = "Callsign format invalid. Please follow the instructions in the console window.";
 						SendPipeMessage(namedPipeClient, msg);
 					}
+
 				}
 
 				// ask user for callsign + verification code,
@@ -111,15 +117,6 @@ namespace FcomClient.UI
 					}
 
 				}
-
-				// Send username to GUI via pipe			
-				string discordUsername = am.DiscordName;
-				Console.WriteLine(discordUsername);
-				logger.Log(string.Format("Pipe to GUI over {0}: {1}", FCOM_GUI_PIPE, discordUsername));
-				//namedPipeClient.Connect();
-				byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(discordUsername);
-				namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
-
 
 				Console.Write("\nDetecting connections...\n\n");
 				ConnectionManager cm = new ConnectionManager();
@@ -226,7 +223,7 @@ namespace FcomClient.UI
 				else if (isStartedWithArgs)
 				{
 					// Notify GUI of crash
-					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes("-1");
+					byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes("FCOM_CLIENT_CRASH");
 					namedPipeClient.Write(messageBytes, 0, messageBytes.Length);
 				}
 			}
