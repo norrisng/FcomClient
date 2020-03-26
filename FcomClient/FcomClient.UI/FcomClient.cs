@@ -270,7 +270,14 @@ namespace FcomClient.UI
 					logger.Log(String.Format("<{0}>", pkt.PacketString));
 					logger.Log(loggingString);
 
-					am.ForwardMessage(pm);
+					try
+					{
+						am.ForwardMessage(pm);
+					}
+					catch (FcomApiException ex)
+					{
+						logger.Log(ex.Message);
+					}
 
 					// Do not forward messages sent over the frequency, that aren't addressed to the user
 					//if (pm.Message.StartsWith(callsign))

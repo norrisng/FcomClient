@@ -160,9 +160,12 @@ namespace FcomClient.Serialization
 			var content = response.Content;
 
 			if (response.IsSuccessful)
-				Console.WriteLine("Success!");
+			{
+			}
 			else
-				Console.WriteLine("Fail!");
+			{
+				throw new FcomApiException(String.Format("Could not forward message. Error: {0}", response.Content));
+			}
 
 		}
 	}
