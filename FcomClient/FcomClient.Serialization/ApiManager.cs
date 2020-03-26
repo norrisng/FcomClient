@@ -14,7 +14,7 @@ namespace FcomClient.Serialization
 		/// <summary>
 		/// User agent string to use.
 		/// </summary>
-		private readonly string CLIENT_VERSION = "FcomClient/0.8.0";
+		private readonly string CLIENT_VERSION = "FcomClient/0.9.1";
 		
 		/// <summary>
 		/// Server address, read from the file server_location.txt
@@ -160,9 +160,12 @@ namespace FcomClient.Serialization
 			var content = response.Content;
 
 			if (response.IsSuccessful)
-				Console.WriteLine("Success!");
+			{
+			}
 			else
-				Console.WriteLine("Fail!");
+			{
+				throw new FcomApiException(String.Format("[Message forwarding error] {0}", response.Content));
+			}
 
 		}
 	}

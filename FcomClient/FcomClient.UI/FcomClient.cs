@@ -270,7 +270,14 @@ namespace FcomClient.UI
 					logger.Log(String.Format("<{0}>", pkt.PacketString));
 					logger.Log(loggingString);
 
-					am.ForwardMessage(pm);
+					try
+					{
+						am.ForwardMessage(pm);
+					}
+					catch (FcomApiException ex)
+					{
+						logger.Log(ex.Message);
+					}
 
 					// Do not forward messages sent over the frequency, that aren't addressed to the user
 					//if (pm.Message.StartsWith(callsign))
@@ -296,8 +303,12 @@ namespace FcomClient.UI
 				string.Equals(msg.Recipient, "data", StringComparison.OrdinalIgnoreCase)
 				;
 
-			// private/frequency messages not addressed to the user...
-			bool isAddressedToUser = msg.Message.StartsWith(callsign, StringComparison.OrdinalIgnoreCase) ||
+			// on-frequency and private messages addressed to the user...
+			
+			// (NOTE: using string.StartsWith() results in partial matches (e.g. UAL1/UAL123), so use regex instead)
+			// Regex: ^{callsign}( |,).*
+			Regex frequencyMessagePattern = new Regex("^" + callsign + @"( |,).*", RegexOptions.IgnoreCase);
+			bool isAddressedToUser = frequencyMessagePattern.IsMatch(msg.Message) ||
 									string.Equals(msg.Recipient, callsign, StringComparison.OrdinalIgnoreCase);
 
 			// self-addressed messages:
