@@ -164,7 +164,7 @@ namespace FcomClient.Serialization
 			}
 			else
 			{
-				throw new FcomApiException(String.Format("Could not forward message. Error: {0}", response.Content));
+				throw new FcomApiException(String.Format("[Message forwarding error] {0}", response.Content));
 			}
 
 		}
