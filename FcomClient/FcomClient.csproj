@@ -90,6 +90,7 @@
     <Compile Include="FcomClient.Serialization\ApiObjects\ForwardedMessage.cs" />
     <Compile Include="FcomClient.Serialization\ApiObjects\MessageForwardRequest.cs" />
     <Compile Include="FcomClient.Serialization\ApiObjects\ServerRegistration.cs" />
+    <Compile Include="FcomClient.Serialization\FcomApiException.cs" />
     <Compile Include="FcomClient.Serialization\MessageForwarder.cs" />
     <Compile Include="FcomClient.UI\FcomClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
