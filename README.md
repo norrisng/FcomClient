@@ -2,7 +2,7 @@
 
 The client that capture messages received over VATSIM / IVAO
 
-Version 0.9.1
+Version 0.9.2
 
 ## Requirements ##
 
