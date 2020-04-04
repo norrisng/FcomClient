@@ -239,9 +239,15 @@ namespace FcomClient.UI
 			// FsdPacket trims the newline, so we have to grab the byte[] ourselves
 			string pktString = System.Text.Encoding.UTF8.GetString(e.Packet.Data);
 
-			string[] inputs = pktString.Split('\n');
-			foreach (string input in inputs)
+			string[] inputs = pktString.Split(new String[] { "\n" }, StringSplitOptions.None);
+			foreach (string line in inputs)
 			{
+				// Strip out the garbage that appears in between FSD packets
+				string input = Regex.Replace(line, "^.*\\$", "$", RegexOptions.Multiline);
+				input = Regex.Replace(input, "^.*#", "#", RegexOptions.Multiline);
+				input = Regex.Replace(input, "^.*%", "%", RegexOptions.Multiline);
+				input = Regex.Replace(input, "^.*@", "@", RegexOptions.Multiline);
+				
 				// First, create a FsdPacket object from the packet
 				FsdPacket currPacket = new FsdPacket(timestamp, input);
 
