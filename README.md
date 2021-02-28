@@ -28,6 +28,14 @@ To run:
 
 
 
+## For developers: GUI source code ##
+
+`FcomClient` (this repo) currently only contains a command-line interface. 
+
+For now, the GUI is implemented via a standalone program. [Its source code can be found here.](https://github.com/norrisng/FcomGui)
+
+
+
 ## More info ##
 
 Website: https://norrisng.ca/fcom
